@@ -1,0 +1,22 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+</head>
+<body>
+    <div>
+        <ul>
+            <li>
+                @Html.RouteLink("Log out", "Logout")
+            </li>
+        </ul>
+        <p>
+            Is authenticated: @User.Identity.IsAuthenticated
+        </p>
+    </div>
+</body>
+</html>

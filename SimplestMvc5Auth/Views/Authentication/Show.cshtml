@@ -1,6 +1,36 @@
-﻿@model SimplestMvc5Auth.LoginModel
+﻿@{
+    Layout = null;
+}
+@model SimplestMvc5Auth.LoginModel
 <!DOCTYPE html>
 <html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Login</title>
+</head>
 <body>
+    @using (Html.BeginRouteForm("Login", new { ReturnUrl = ViewBag.ReturnUrl }))
+    {
+        <fieldset>
+            <legend>Login</legend>
+            <div class="label">
+                @Html.LabelFor(model => model.Username)
+            </div>
+            <div class="input">
+                @Html.TextBoxFor(model => model.Username)
+            </div>
+
+            <div class="label">
+                @Html.LabelFor(model => model.Password)
+            </div>
+            <div class="input">
+                @Html.PasswordFor(model => model.Password)
+            </div>
+
+            @Html.AntiForgeryToken()
+
+            <input type="submit" value="Login" />
+        </fieldset>
+    }
 </body>
 </html>

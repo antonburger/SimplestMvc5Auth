@@ -15,15 +15,16 @@ namespace SimplestMvc5Auth
 
         [HttpGet]
         [Route("login")]
-        public ActionResult Show()
+        public ActionResult Show(string returnUrl)
         {
+            ViewBag.ReturnUrl = returnUrl;
             return View();
         }
 
         [HttpPost]
-        [Route("login")]
+        [Route("login", Name = "Login")]
         [ValidateAntiForgeryToken]
-        public ActionResult Login(LoginModel input)
+        public ActionResult Login(LoginModel input, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -44,7 +45,9 @@ namespace SimplestMvc5Auth
                         },
                         identity);
 
-                    return RedirectToAction("index", "home");
+                    return string.IsNullOrEmpty(returnUrl)
+                        ? (ActionResult)RedirectToAction("Index", "Home")
+                        : Redirect(returnUrl);
                 }
             }
 
@@ -52,7 +55,7 @@ namespace SimplestMvc5Auth
         }
 
         [HttpGet]
-        [Route("logout")]
+        [Route("logout", Name = "Logout")]
         public ActionResult Logout()
         {
             Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
