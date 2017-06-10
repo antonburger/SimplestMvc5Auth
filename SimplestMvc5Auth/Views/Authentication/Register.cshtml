@@ -1,15 +1,15 @@
 ﻿@{
     Layout = null;
 }
-@model SimplestMvc5Auth.LoginModel
+@model SimplestMvc5Auth.RegisterModel
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Login</title>
+    <title>Register</title>
 </head>
 <body>
-    @using (Html.BeginRouteForm("Login", new { ReturnUrl = ViewBag.ReturnUrl }))
+    @using (Html.BeginRouteForm("Register"))
     {
         <fieldset>
             <legend>Login</legend>
@@ -27,9 +27,16 @@
                 @Html.PasswordFor(model => model.Password)
             </div>
 
+            <div class="label">
+                @Html.LabelFor(model => model.ConfirmPassword)
+            </div>
+            <div class="input">
+                @Html.PasswordFor(model => model.ConfirmPassword)
+            </div>
+
             @Html.AntiForgeryToken()
 
-            <input type="submit" value="Login" />
+            <input type="submit" value="Register" />
         </fieldset>
     }
 </body>

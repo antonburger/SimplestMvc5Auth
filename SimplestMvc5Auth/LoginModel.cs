@@ -1,17 +1,25 @@
-﻿namespace SimplestMvc5Auth
+﻿using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using SimplestMvc5Auth.Identity;
+
+namespace SimplestMvc5Auth
 {
     public class LoginModel
     {
-        public string Username { get; set; }
+        [Required]
+        public string UserName { get; set; }
+        [Required]
         public string Password { get; set; }
         public bool RememberMe { get; set; }
 
-        public bool HasValidUsernameAndPassword
+        public async Task<User> AuthenticateAsync(UserManager userManager)
         {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(Password);
-            }
+            var user = await userManager.FindByNameAsync(UserName).ConfigureAwait(false);
+            if (user == null) return null;
+            var passwordCheck = await userManager.CheckPasswordAsync(user, Password);
+            return passwordCheck
+                ? user
+                : null;
         }
     }
 }

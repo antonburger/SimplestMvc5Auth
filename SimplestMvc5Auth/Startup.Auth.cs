@@ -2,6 +2,7 @@
 using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Owin;
+using SimplestMvc5Auth.Identity;
 
 namespace SimplestMvc5Auth
 {
@@ -14,6 +15,8 @@ namespace SimplestMvc5Auth
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/login"),
             });
+
+            app.CreatePerOwinContext(() => new UserManager(new UserStore()));
         }
     }
 }
