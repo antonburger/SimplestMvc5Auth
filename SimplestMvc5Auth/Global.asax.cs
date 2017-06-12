@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Claims;
+using System.Web.Helpers;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -15,6 +17,8 @@ namespace SimplestMvc5Auth
         protected void Application_Start(object sender, EventArgs e)
         {
             RegisterRoutes(RouteTable.Routes);
+
+            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;
         }
 
         protected void Session_Start(object sender, EventArgs e)
