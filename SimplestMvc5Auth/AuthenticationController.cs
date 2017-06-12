@@ -16,9 +16,8 @@ namespace SimplestMvc5Auth
             get { return HttpContext.GetOwinContext().Authentication; }
         }
 
-        [HttpGet]
         [Route("login")]
-        public ActionResult Show(string returnUrl)
+        public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
             return View();
@@ -56,10 +55,9 @@ namespace SimplestMvc5Auth
                 }
             }
 
-            return View("show", input);
+            return View(input);
         }
 
-        [HttpGet]
         [Route("register")]
         public ActionResult Register()
         {
@@ -103,7 +101,6 @@ namespace SimplestMvc5Auth
             return View("register", input);
         }
 
-        [HttpGet]
         [Route("logout", Name = "Logout")]
         public ActionResult Logout()
         {

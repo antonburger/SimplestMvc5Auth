@@ -114,7 +114,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
-    <Content Include="Views\Authentication\Show.cshtml" />
+    <Content Include="Views\Authentication\Login.cshtml" />
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
