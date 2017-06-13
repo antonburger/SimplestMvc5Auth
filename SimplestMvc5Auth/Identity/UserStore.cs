@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Hosting;
 using System.Xml.Serialization;
@@ -8,7 +10,7 @@ using SimplestMvc5Auth.Identity.Persistence;
 
 namespace SimplestMvc5Auth.Identity
 {
-    public class UserStore : IUserStore<User, int>, IUserPasswordStore<User, int>
+    public class UserStore : IUserStore<User, int>, IUserPasswordStore<User, int>, IUserLoginStore<User, int>
     {
         public async Task CreateAsync(User user)
         {
@@ -127,6 +129,68 @@ namespace SimplestMvc5Auth.Identity
             stream.SetLength(0L);
             var serializer = new XmlSerializer(typeof(UserDatabase));
             serializer.Serialize(stream, database);
+        }
+
+        public async Task AddLoginAsync(User user, UserLoginInfo login)
+        {
+            using (var stream = OpenUserDatabase())
+            {
+                var db = ReadUserDatabase(stream);
+                var persistenceUser = db.FindUser(user.Id);
+                if (persistenceUser == null) return;
+                var logins = new List<ExternalLogin>(persistenceUser.ExternalLogins ?? Enumerable.Empty<ExternalLogin>());
+                logins.Add(ExternalLogin.FromUserLoginInfo(login));
+                persistenceUser.ExternalLogins = logins.ToArray();
+                UpdateUserDatabase(stream, db);
+            }
+        }
+
+        public async Task RemoveLoginAsync(User user, UserLoginInfo login)
+        {
+            using (var stream = OpenUserDatabase())
+            {
+                var db = ReadUserDatabase(stream);
+                var persistenceUser = db.FindUser(user.Id);
+                if (persistenceUser == null) return;
+                var logins = new List<ExternalLogin>(persistenceUser.ExternalLogins ?? Enumerable.Empty<ExternalLogin>());
+                var removedCount = logins.RemoveAll(l => l.Key == login.ProviderKey && l.Provider == login.LoginProvider);
+                if (removedCount > 0)
+                {
+                    UpdateUserDatabase(stream, db);
+                }
+            }
+        }
+
+        public async Task<IList<UserLoginInfo>> GetLoginsAsync(User user)
+        {
+            using (var stream = OpenUserDatabase())
+            {
+                var db = ReadUserDatabase(stream);
+                var persistenceUser = db.FindUser(user.Id);
+                if (persistenceUser == null) return new UserLoginInfo[0];
+                var logins = new List<ExternalLogin>(persistenceUser.ExternalLogins ?? Enumerable.Empty<ExternalLogin>());
+                return logins.ConvertAll(ConvertPersistenceLoginToLogin);
+            }
+        }
+
+        public async Task<User> FindAsync(UserLoginInfo login)
+        {
+            using (var stream = OpenUserDatabase())
+            {
+                var db = ReadUserDatabase(stream);
+                var matchingUsers = from user in db.Users
+                                    let logins = user.ExternalLogins ?? Enumerable.Empty<ExternalLogin>()
+                                    from externalLogin in logins
+                                    where externalLogin.Provider == login.LoginProvider && externalLogin.Key == login.ProviderKey
+                                    select user;
+
+                return matchingUsers.FirstOrDefault()?.ToUser();
+            }
+        }
+
+        private static UserLoginInfo ConvertPersistenceLoginToLogin(ExternalLogin login)
+        {
+            return new UserLoginInfo(login.Provider, login.Key);
         }
     }
 }

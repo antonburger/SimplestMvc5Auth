@@ -26,9 +26,7 @@
             <div class="input">
                 @Html.PasswordFor(model => model.Password)
             </div>
-
             @Html.AntiForgeryToken()
-
             <input type="submit" value="Login" />
         </fieldset>
     }

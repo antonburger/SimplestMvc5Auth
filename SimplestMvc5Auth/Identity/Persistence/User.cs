@@ -13,6 +13,10 @@ namespace SimplestMvc5Auth.Identity.Persistence
         [XmlElement("passwordHash")]
         public string PasswordHash { get; set; }
 
+        [XmlArray("external-logins")]
+        [XmlArrayItem("external-login")]
+        public ExternalLogin[] ExternalLogins { get; set; }
+
         public Identity.User ToUser() => new Identity.User(Id, UserName);
     }
 }

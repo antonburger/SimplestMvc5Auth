@@ -17,8 +17,6 @@ namespace SimplestMvc5Auth
         protected void Application_Start(object sender, EventArgs e)
         {
             RegisterRoutes(RouteTable.Routes);
-
-            AntiForgeryConfig.UniqueClaimTypeIdentifier = ClaimTypes.Name;
         }
 
         protected void Session_Start(object sender, EventArgs e)

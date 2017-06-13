@@ -9,11 +9,17 @@ using SimplestMvc5Auth.Identity;
 
 namespace SimplestMvc5Auth
 {
+    [RequireHttps]
     public class AuthenticationController : Controller
     {
         private IAuthenticationManager Authentication
         {
             get { return HttpContext.GetOwinContext().Authentication; }
+        }
+
+        private UserManager UserManager
+        {
+            get { return HttpContext.GetOwinContext().GetUserManager<UserManager>(); }
         }
 
         [Route("login")]
@@ -30,18 +36,16 @@ namespace SimplestMvc5Auth
         {
             if (ModelState.IsValid)
             {
-                var userManager = HttpContext.GetOwinContext().GetUserManager<UserManager>();
-                var user = await input.AuthenticateAsync(userManager);
+                var user = await input.AuthenticateAsync(UserManager);
                 if (user != null)
                 {
                     var identity = new ClaimsIdentity(new[]
                         {
                             new Claim(ClaimTypes.Name, user.UserName),
+                            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                         },
                         DefaultAuthenticationTypes.ApplicationCookie,
                         ClaimTypes.Name, ClaimTypes.Role);
-
-                    identity.AddClaim(new Claim(ClaimTypes.Role, "guest"));
 
                     Authentication.SignIn(new AuthenticationProperties
                     {
@@ -77,8 +81,7 @@ namespace SimplestMvc5Auth
                 }
                 else
                 {
-                    var userManager = HttpContext.GetOwinContext().GetUserManager<UserManager>();
-                    var existingUser = await userManager.FindByNameAsync(input.UserName);
+                    var existingUser = await UserManager.FindByNameAsync(input.UserName);
                     if (existingUser != null)
                     {
                         ModelState.AddModelError("UserAlreadyExists", "User already exists.");
@@ -92,13 +95,38 @@ namespace SimplestMvc5Auth
                         // Using AddPasswordAsync instead does the user creation first.
                         // Someone else has come across this here:
                         // https://stackoverflow.com/questions/20161598/what-are-all-the-things-setpasswordhashasync-must-accomplish-in-the-ipasswordsto
-                        var result = await userManager.CreateAsync(user);
-                        await userManager.AddPasswordAsync(user.Id, input.Password);
+                        var result = await UserManager.CreateAsync(user);
+                        await UserManager.AddPasswordAsync(user.Id, input.Password);
                     }
                 }
             }
 
             return View("register", input);
+        }
+
+        [Authorize]
+        [Route("associate-external")]
+        public ActionResult AssociateExternalLogin(string provider)
+        {
+            return new ChallengeResult(provider, Url.Action("ConfirmExternalLogin", "Authentication"), User.Identity.GetUserId());
+        }
+
+        [Authorize]
+        [Route("confirm-external")]
+        public async Task<ActionResult> ConfirmExternalLogin()
+        {
+            if (ModelState.IsValid)
+            {
+                var info = await Authentication.GetExternalLoginInfoAsync("XsrfId", User.Identity.GetUserId());
+                if (info == null)
+                {
+                    return View("ExternalLoginFailure");
+                }
+
+                var result = await UserManager.AddLoginAsync(User.Identity.GetUserId<int>(), info.Login);
+                return View("ExternalLoginSuccess");
+            }
+            return View("ExternalLoginFailure");
         }
 
         [Route("logout", Name = "Logout")]
