@@ -2,6 +2,7 @@
     Layout = null;
 }
 @model SimplestMvc5Auth.LoginModel
+@using Microsoft.Owin.Security
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +10,7 @@
     <title>Login</title>
 </head>
 <body>
+    @Html.ValidationSummary()
     @using (Html.BeginRouteForm("Login", new { ReturnUrl = ViewBag.ReturnUrl }))
     {
         <fieldset>
@@ -28,6 +30,20 @@
             </div>
             @Html.AntiForgeryToken()
             <input type="submit" value="Login" />
+        </fieldset>
+    }
+    @using (Html.BeginForm("ExternalLogin", "Authentication"))
+    {
+        <fieldset>
+            <legend>Login with a third party account</legend>
+            @{
+                var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+                foreach (var provider in loginProviders)
+                {
+                    <button type="submit" id="@provider.AuthenticationType" name="provider" value="@provider.AuthenticationType" title="Log in using your @provider.Caption account">@provider.AuthenticationType</button>
+                }
+            }
+            @Html.AntiForgeryToken()
         </fieldset>
     }
 </body>

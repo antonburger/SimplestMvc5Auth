@@ -23,6 +23,7 @@ namespace SimplestMvc5Auth
         }
 
         [Route("login")]
+        [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -30,6 +31,7 @@ namespace SimplestMvc5Auth
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("login", Name = "Login")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginModel input, string returnUrl)
@@ -48,9 +50,9 @@ namespace SimplestMvc5Auth
                         ClaimTypes.Name, ClaimTypes.Role);
 
                     Authentication.SignIn(new AuthenticationProperties
-                    {
-                        IsPersistent = input.RememberMe,
-                    },
+                        {
+                            IsPersistent = input.RememberMe,
+                        },
                         identity);
 
                     return string.IsNullOrEmpty(returnUrl)
@@ -60,6 +62,58 @@ namespace SimplestMvc5Auth
             }
 
             return View(input);
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("login-external")]
+        [ValidateAntiForgeryToken]
+        public ActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            return new ChallengeResult(provider, Url.Action("ConfirmExternalLogin", "Authentication", new { returnUrl = returnUrl }));
+        }
+
+        [AllowAnonymous]
+        [Route("confirm-login-external")]
+        public async Task<ActionResult> ConfirmExternalLogin(string returnUrl)
+        {
+            if (ModelState.IsValid)
+            {
+                var info = await Authentication.GetExternalLoginInfoAsync();
+                if (info == null)
+                {
+                    ModelState.AddModelError("", "Failed to log in via external provider.");
+                    return View("Login");
+                }
+
+                var user = await UserManager.FindAsync(info.Login);
+                if (user == null)
+                {
+                    ModelState.AddModelError("", "External provider identity is not registered to any users.");
+                    return View("Login");
+                }
+
+                // TODO: Is this duplication from Login needed?
+                var identity = new ClaimsIdentity(new[]
+                    {
+                        new Claim(ClaimTypes.Name, user.UserName),
+                        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    },
+                    DefaultAuthenticationTypes.ApplicationCookie,
+                    ClaimTypes.Name, ClaimTypes.Role);
+
+                Authentication.SignIn(new AuthenticationProperties
+                    {
+                        IsPersistent = false,
+                    },
+                    identity);
+
+                return string.IsNullOrEmpty(returnUrl)
+                    ? (ActionResult)RedirectToAction("Index", "Home")
+                    : Redirect(returnUrl);
+            }
+
+            return View("Login");
         }
 
         [Route("register")]
@@ -108,12 +162,12 @@ namespace SimplestMvc5Auth
         [Route("associate-external")]
         public ActionResult AssociateExternalLogin(string provider)
         {
-            return new ChallengeResult(provider, Url.Action("ConfirmExternalLogin", "Authentication"), User.Identity.GetUserId());
+            return new ChallengeResult(provider, Url.Action("ConfirmAssociateExternalLogin", "Authentication"), User.Identity.GetUserId());
         }
 
         [Authorize]
-        [Route("confirm-external")]
-        public async Task<ActionResult> ConfirmExternalLogin()
+        [Route("confirm-associate-external")]
+        public async Task<ActionResult> ConfirmAssociateExternalLogin()
         {
             if (ModelState.IsValid)
             {
