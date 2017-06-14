@@ -10,6 +10,7 @@ using SimplestMvc5Auth.Identity;
 namespace SimplestMvc5Auth
 {
     [RequireHttps]
+    [AllowAnonymous]
     public class AuthenticationController : Controller
     {
         private IAuthenticationManager Authentication
@@ -23,7 +24,6 @@ namespace SimplestMvc5Auth
         }
 
         [Route("login")]
-        [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -31,8 +31,7 @@ namespace SimplestMvc5Auth
         }
 
         [HttpPost]
-        [AllowAnonymous]
-        [Route("login", Name = "Login")]
+        [Route("login")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Login(LoginModel input, string returnUrl)
         {
@@ -65,15 +64,13 @@ namespace SimplestMvc5Auth
         }
 
         [HttpPost]
-        [AllowAnonymous]
         [Route("login-external")]
         [ValidateAntiForgeryToken]
         public ActionResult ExternalLogin(string provider, string returnUrl)
         {
-            return new ChallengeResult(provider, Url.Action("ConfirmExternalLogin", "Authentication", new { returnUrl = returnUrl }));
+            return new ChallengeResult(provider, Url.Action("ConfirmExternalLogin", "Authentication", new { ReturnUrl = returnUrl }));
         }
 
-        [AllowAnonymous]
         [Route("confirm-login-external")]
         public async Task<ActionResult> ConfirmExternalLogin(string returnUrl)
         {
@@ -123,7 +120,7 @@ namespace SimplestMvc5Auth
         }
 
         [HttpPost]
-        [Route("register", Name = "Register")]
+        [Route("register")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Register(RegisterModel input)
         {
@@ -183,7 +180,8 @@ namespace SimplestMvc5Auth
             return View("ExternalLoginFailure");
         }
 
-        [Route("logout", Name = "Logout")]
+        [Authorize]
+        [Route("logout")]
         public ActionResult Logout()
         {
             Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);

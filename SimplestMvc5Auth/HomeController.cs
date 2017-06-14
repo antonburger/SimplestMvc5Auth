@@ -3,6 +3,7 @@
 namespace SimplestMvc5Auth
 {
     [RequireHttps]
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         [Route("")]
