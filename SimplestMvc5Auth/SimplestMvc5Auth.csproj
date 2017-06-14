@@ -130,6 +130,8 @@
     <Content Include="Views\Authentication\Register.cshtml" />
     <Content Include="Views\Authentication\ExternalLoginFailure.cshtml" />
     <Content Include="Views\Authentication\ExternalLoginSuccess.cshtml" />
+    <Content Include="Views\Shared\_Layout.cshtml" />
+    <Content Include="Views\_ViewStart.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

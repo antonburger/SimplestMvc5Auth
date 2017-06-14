@@ -1,23 +1,9 @@
-﻿@{
-    Layout = null;
+﻿@{ 
+    ViewBag.Title = "Secured";
 }
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Secured</title>
-</head>
-<body>
-    <div>
-        <ul>
-            <li>
-                @Html.RouteLink("Log out", "Logout")
-            </li>
-        </ul>
-        <p>Secured page</p>
-        <p>
-            Is authenticated: @User.Identity.IsAuthenticated
-        </p>
-    </div>
-</body>
-</html>
+<div>
+    <p>Secured page</p>
+    <p>
+        Is authenticated: @User.Identity.IsAuthenticated
+    </p>
+</div>

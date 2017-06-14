@@ -1,33 +1,3 @@
-﻿@{
-    Layout = null;
+﻿@{ 
+    ViewBag.Title = "Home";
 }
-@using Microsoft.Owin.Security
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Home</title>
-</head>
-<body>
-    <div>
-        <ul>
-            <li>
-                @Html.RouteLink("Log out", "Logout")
-            </li>
-            @if (User.Identity.IsAuthenticated)
-            {
-                var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
-                foreach (var provider in loginProviders)
-                {
-                    <li>
-                        @Html.ActionLink("Associate your " + provider.Caption + " account", "AssociateExternalLogin", new { controller = "Authentication", provider = provider.AuthenticationType })
-                    </li>
-                }
-            }
-        </ul>
-        <p>
-            Is authenticated: @User.Identity.IsAuthenticated
-        </p>
-    </div>
-</body>
-</html>

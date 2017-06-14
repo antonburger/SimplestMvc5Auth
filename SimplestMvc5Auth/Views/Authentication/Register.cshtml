@@ -1,43 +1,34 @@
-﻿@{
-    Layout = null;
+﻿@{ 
+    ViewBag.Title = "Register";
 }
 @model SimplestMvc5Auth.RegisterModel
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Register</title>
-</head>
-<body>
-    @using (Html.BeginRouteForm("Register"))
-    {
-        <fieldset>
-            <legend>Login</legend>
-            <div class="label">
-                @Html.LabelFor(model => model.UserName)
-            </div>
-            <div class="input">
-                @Html.TextBoxFor(model => model.UserName)
-            </div>
+@using (Html.BeginRouteForm("Register"))
+{
+    <fieldset>
+        <legend>Login</legend>
+        <div class="label">
+            @Html.LabelFor(model => model.UserName)
+        </div>
+        <div class="input">
+            @Html.TextBoxFor(model => model.UserName)
+        </div>
 
-            <div class="label">
-                @Html.LabelFor(model => model.Password)
-            </div>
-            <div class="input">
-                @Html.PasswordFor(model => model.Password)
-            </div>
+        <div class="label">
+            @Html.LabelFor(model => model.Password)
+        </div>
+        <div class="input">
+            @Html.PasswordFor(model => model.Password)
+        </div>
 
-            <div class="label">
-                @Html.LabelFor(model => model.ConfirmPassword)
-            </div>
-            <div class="input">
-                @Html.PasswordFor(model => model.ConfirmPassword)
-            </div>
+        <div class="label">
+            @Html.LabelFor(model => model.ConfirmPassword)
+        </div>
+        <div class="input">
+            @Html.PasswordFor(model => model.ConfirmPassword)
+        </div>
 
-            @Html.AntiForgeryToken()
+        @Html.AntiForgeryToken()
 
-            <input type="submit" value="Register" />
-        </fieldset>
-    }
-</body>
-</html>
+        <input type="submit" value="Register" />
+    </fieldset>
+}

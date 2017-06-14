@@ -1,50 +1,41 @@
-﻿@{
-    Layout = null;
+﻿@{ 
+    ViewBag.Title = "Login";
 }
 @model SimplestMvc5Auth.LoginModel
 @using Microsoft.Owin.Security
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Login</title>
-</head>
-<body>
-    @Html.ValidationSummary()
-    @using (Html.BeginRouteForm("Login", new { ReturnUrl = ViewBag.ReturnUrl }))
-    {
-        <fieldset>
-            <legend>Login</legend>
-            <div class="label">
-                @Html.LabelFor(model => model.UserName)
-            </div>
-            <div class="input">
-                @Html.TextBoxFor(model => model.UserName)
-            </div>
+@Html.ValidationSummary()
+@using (Html.BeginRouteForm("Login", new { ReturnUrl = ViewBag.ReturnUrl }))
+{
+    <fieldset>
+        <legend>Login</legend>
+        <div class="label">
+            @Html.LabelFor(model => model.UserName)
+        </div>
+        <div class="input">
+            @Html.TextBoxFor(model => model.UserName)
+        </div>
 
-            <div class="label">
-                @Html.LabelFor(model => model.Password)
-            </div>
-            <div class="input">
-                @Html.PasswordFor(model => model.Password)
-            </div>
-            @Html.AntiForgeryToken()
-            <input type="submit" value="Login" />
-        </fieldset>
-    }
-    @using (Html.BeginForm("ExternalLogin", "Authentication"))
-    {
-        <fieldset>
-            <legend>Login with a third party account</legend>
-            @{
-                var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
-                foreach (var provider in loginProviders)
-                {
-                    <button type="submit" id="@provider.AuthenticationType" name="provider" value="@provider.AuthenticationType" title="Log in using your @provider.Caption account">@provider.AuthenticationType</button>
-                }
+        <div class="label">
+            @Html.LabelFor(model => model.Password)
+        </div>
+        <div class="input">
+            @Html.PasswordFor(model => model.Password)
+        </div>
+        @Html.AntiForgeryToken()
+        <input type="submit" value="Login" />
+    </fieldset>
+}
+@using (Html.BeginForm("ExternalLogin", "Authentication"))
+{
+    <fieldset>
+        <legend>Login with a third party account</legend>
+        @{
+            var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
+            foreach (var provider in loginProviders)
+            {
+                <button type="submit" id="@provider.AuthenticationType" name="provider" value="@provider.AuthenticationType" title="Log in using your @provider.Caption account">@provider.AuthenticationType</button>
             }
-            @Html.AntiForgeryToken()
-        </fieldset>
-    }
-</body>
-</html>
+        }
+        @Html.AntiForgeryToken()
+    </fieldset>
+}
